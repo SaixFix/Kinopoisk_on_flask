@@ -16,13 +16,24 @@ class MovieService:
         """Создаем новый фильм"""
         return self.dao.create(data)
 
-    def update(self, data: dict):
+    def update(self, data: dict, fid: int):
         """Обновляем данные фильма"""
-        self.session.add(data)
-        self.session.commit()
+        movie = self.get_one(fid)
+        if "title" in data:
+            movie.title = data.get("title")
+        if "trailer" in data:
+            movie.trailer = data.get("trailer")
+        if "year" in data:
+            movie.year = data.get("year")
+        if "rating" in data:
+            movie.rating = data.get("rating")
+        if "genre_id" in data:
+            movie.title = data.get("genre_id")
+        if "director_id" in data:
+            movie.title = data.get("director_id")
+
+        self.dao.update(movie)
 
     def delete(self, fid):
         """Удаляем фильм по id"""
-        movie = self.get_one(fid)
-        self.session.delete(movie)
-        self.session.commit()
+        self.dao.delete(fid)

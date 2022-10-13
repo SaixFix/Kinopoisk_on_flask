@@ -11,9 +11,9 @@ class UserDAO:
         """Возвращает всех пользователей"""
         return self.session.query(User).all()
 
-    def get_one(self, did):
-        """Возвращает пользователя по id"""
-        return self.session.query(User).get(did)
+    def get_one(self, username: str):
+        """Возвращает пользователя по username"""
+        return self.session.query(User).get(username)
 
     def create(self, data: dict):
         """Создаем нового пользователя"""
@@ -26,8 +26,8 @@ class UserDAO:
         self.session.add(data)
         self.session.commit()
 
-    def delete(self, did):
+    def delete(self, username: str):
         """Удаляем пользователя по id"""
-        user = self.get_one(did)
+        user = self.get_one(username)
         self.session.delete(user)
         self.session.commit()
