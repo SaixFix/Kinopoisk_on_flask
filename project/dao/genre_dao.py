@@ -1,7 +1,7 @@
 from project.dao.models.genre import Genre
 
 
-class DirectorDAO:
+class GenreDAO:
 
     def __init__(self, session):
         """Получает сессию"""

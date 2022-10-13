@@ -1,7 +1,7 @@
 from project.dao.models.user import User
 
 
-class DirectorDAO:
+class UserDAO:
 
     def __init__(self, session):
         """Получает сессию"""
