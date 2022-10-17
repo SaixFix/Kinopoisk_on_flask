@@ -1,16 +1,17 @@
 from marshmallow import Schema, fields
+from sqlalchemy import Column, String, ForeignKey
 
-from project.setup.db import db
+from project.dao.models.genre import Genre
+from project.setup.db import models
 
 
-class User(db.Model):
+class User(models):
     __tablename__ = "user"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    surname = db.Column(db.String(100))
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(100), unique=True, nullable=False)
-    favorite_genre = db.Column(db.String(50))
+    name = Column(String(100))
+    surname = Column(String(100))
+    email = Column(String(100), unique=True, nullable=False)
+    password = Column(String(300), unique=True, nullable=False)
+    favorite_genre = Column(String(50))
 
 
 class UserSchema(Schema):
@@ -19,5 +20,5 @@ class UserSchema(Schema):
     password = fields.String
     name = fields.String()
     surname = fields.String()
-    favorite_genre = fields.String()
+    favorite_genre = Column(ForeignKey(f"{Genre.__tablename__}.id"), nullable=False)
 
