@@ -1,32 +1,24 @@
 from flask import request
 from flask_restx import Namespace, Resource
 
-from project.container import genre_service
+from project.container import genre_service, director_service
 from project.dao.models.director import DirectorSchema
-from project.setup.api.models import genre
+from project.setup.api.models import genre, director
 from project.setup.api.parsers import page_parser
 
-director_schema = DirectorSchema()
-directors_schema = DirectorSchema(many=True)
 
-
-api = Namespace('genres')
+api = Namespace('directors')
 
 
 @api.route('/')
 class DirectorsView(Resource):
     @api.expect(page_parser)
-    @api.marshal_with(genre, as_list=True, code=200, description='OK')
+    @api.marshal_with(director, as_list=True, code=200, description='OK')
     def get(self):
         """
         Get all genres.
         """
-        return genre_service.get_all(**page_parser.parse_args())
-
-    def post(self):
-        """create new director"""
-        req_json = request.json
-        pass
+        return director_service.get_all(**page_parser.parse_args())
 
 
 @api.route('/<int:did>/')

@@ -1,15 +1,15 @@
 from typing import Optional
 
+from project.dao import MovieDAO
 from project.dao.base import BaseDAO
 from project.dao.models.movie import Movie
 from project.exceptions import ItemNotFound
 from project.models import Genre
 
 
-
 class MovieService:
 
-    def __init__(self, dao: BaseDAO) -> None:
+    def __init__(self, dao: MovieDAO) -> None:
         self.dao = dao
 
     def get_item(self, pk: int) -> Genre:
