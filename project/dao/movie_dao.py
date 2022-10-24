@@ -5,7 +5,7 @@ from sqlalchemy import desc
 from werkzeug.exceptions import NotFound
 
 from project.dao.base import BaseDAO
-from project.dao.models.movie import Movie
+from project.models import Movie
 
 
 class MovieDAO(BaseDAO[Movie]):

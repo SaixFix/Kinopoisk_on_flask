@@ -2,7 +2,6 @@ from flask import request
 from flask_restx import Namespace, Resource
 
 from project.container import genre_service, director_service
-from project.dao.models.director import DirectorSchema
 from project.setup.api.models import genre, director
 from project.setup.api.parsers import page_parser
 
