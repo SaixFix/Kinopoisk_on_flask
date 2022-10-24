@@ -1,7 +1,4 @@
-from project.dao import GenresDAO
-from project.dao.director_dao import DirectorDAO
-from project.dao.movie_dao import MovieDAO
-from project.dao.user_dao import UserDAO
+from project.dao import GenresDAO, DirectorDAO, MovieDAO, UserDAO
 
 from project.services import GenresService
 from project.services.movie_service import MovieService

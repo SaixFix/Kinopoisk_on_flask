@@ -10,6 +10,7 @@ class BaseConfig:
     SECRET_KEY = os.getenv('SECRET_KEY', 'you-will-never-guess')
     JSON_AS_ASCII = False
 
+
     ITEMS_PER_PAGE = 12
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -38,7 +39,7 @@ class DevelopmentConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     DEBUG = False
-    # TODO: дополнить конфиг
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + BASE_DIR.joinpath('project.db').as_posix()
 
 
 class ConfigFactory:

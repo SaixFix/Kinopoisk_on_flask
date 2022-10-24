@@ -3,42 +3,38 @@ from flask_restx import Namespace, Resource
 
 from project.container import movie_service
 from project.dao.models.movie import MovieSchema
+from project.setup.api.parsers import page_parser
 
-movie_ns = Namespace("movies")
+api = Namespace('movies')
 
 movie_schema = MovieSchema()
 movies_schema = MovieSchema(many=True)
 
-#todo доделать вьюшки
-@movie_ns.route("/")
-class MoviesView(Resource):
 
+@api.route('/')
+class GenresView(Resource):
+    @api.expect(page_parser)
+    @api.marshal_with(movie, as_list=True, code=200, description='OK')
     def get(self):
-        """Get all movies"""
-        movies = movie_service.get_all()
-        return movies_schema.dump(movies), 200
+        """
+        Get all genres.
+        """
+        filter = request.args.get('status')
 
-    def post(self):
-        """create new movie"""
-        req_json = request.json
-        movie_service.create(req_json)
-        return "", 201
+        if filter != None and filter == 'new':
+            return movie_service.get_all(filter=filter, **page_parser.parse_args())
+        else:
+            return movie_service.get_all(**page_parser.parse_args())
 
 
-@movie_ns.route("/<int:fid>")
+@api.route("/<int:fid>")
 class MovieView(Resource):
+    @api.response(404, 'Not Found')
+    @api.marshal_with(movie, code=200, description='OK')
+    def get(self, genre_id: int):
+        """
+        Get genre by id.
+        """
+        return movie_service.get_item(genre_id)
 
-    def get(self, fid):
-        """get movie by id"""
-        movie = movie_service.get_one(fid)
-        return movie_schema.dump(movie)
-
-    def put(self, fid):
-        """update movie by id"""
-        req_json = request.json
-        pass
-
-    def delete(self, fid):
-        """delete movie by id"""
-        pass
 
