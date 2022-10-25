@@ -1,31 +1,49 @@
 from project.dao.user_dao import UserDAO
+from project.models import User
+from project.exceptions import ItemNotFound
+from typing import Optional
+from project.tools.security import generate_password_hash, get_data_from_token, approve_refresh_token, generate_tokens
 
 
 class UserService:
 
-    def __init__(self, dao: UserDAO):
-        """Получает сессию"""
+    def __init__(self, dao: UserDAO) -> None:
         self.dao = dao
 
-    def get_all(self) -> list[dict]:
-        """Возвращает всех пользователей"""
-        return self.dao.get_all()
+    def get_item(self, pk: int) -> User:
+        if user := self.dao.get_by_id(pk):
+            return user
+        raise ItemNotFound(f'User with pk={pk} not exists.')
 
-    def get_one(self, username: str):
-        """Возвращает пользователя по username"""
-        return self.dao.get_one(username)
+    def get_all(self, page: Optional[int] = None) -> list[User]:
+        return self.dao.get_all(page=page)
 
-    def create(self, data: dict):
-        """Создаем нового пользователя"""
-        self.dao.create(data)
+    def create_user(self, login, password):
+        self.dao.create(login, password)
 
-    def update(self, data: dict, username: str):
-        """Обновляем данные пользователя"""
-        user = self.get_one(username) #todo переделать
+    def get_user_by_login(self, login):
+        return self.dao.get_user_by_login(login)
 
-        if "password" in data:
-            user.password = data.get("password")
+    def check(self, login, password):
+        user = self.get_user_by_login(login)
+        return generate_tokens(email=user.email, password=password, password_hash=user.password)
 
-    def delete(self, username: str):
-        """Удаляем пользователя по id"""
-        self.dao.delete(username)
+    def update_token(self, refresh_token):
+        return approve_refresh_token(refresh_token)
+
+    def get_user_by_token(self, refresh_token):
+        data = get_data_from_token(refresh_token)
+
+        if data:
+            return self.get_user_by_login(data.get('email'))
+
+    def update_user(self, data: dict, refresh_token):
+        user = self.get_user_by_token(refresh_token)
+        if user:
+            self.dao.update(login=user.email, data=data)
+
+    def update_password(self, data, refresh_token):
+        user = self.get_user_by_token(refresh_token)
+        if user:
+            self.dao.update(login=user.email, data={'password': generate_password_hash(data.get('password_2'))})
+            return self.chech(login=user.email, password=data.get('password_2'))

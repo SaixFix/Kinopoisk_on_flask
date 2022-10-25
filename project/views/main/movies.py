@@ -18,7 +18,7 @@ class GenresView(Resource):
         """
         filter = request.args.get('status')
 
-        if filter != None and filter == 'new':
+        if filter != None and (filter == 'new' or filter == 'old'):
             return movie_service.get_all(filter=filter, **page_parser.parse_args())
         else:
             return movie_service.get_all(**page_parser.parse_args())

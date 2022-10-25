@@ -11,11 +11,13 @@ from project.models import Movie
 class MovieDAO(BaseDAO[Movie]):
     __model__ = Movie
 
-    def get_all_order_by(self, page:Optional[int], filter: Optional[str]):
+    def get_all_order_by(self, page, filter):
         """Функция выводит список фильмов по странично(если задано на входе) и с фильтрацией по году(если фильтр задан на входе)"""
-        stmt: BaseQuery = self._db_session.query(self.__model__)  # select * from self model
-        if filter:
-            stmt = stmt.order_by(desc(self.__model__))  # order_by model.year desc
+        stmt = self._db_session.query(self.__model__)  # select * from self model
+        if filter == 'new':
+            stmt = stmt.order_by(desc(self.__model__.year))  # order_by model.year desc
+        if filter == 'old':
+            stmt = stmt.order_by(self.__model__.year) # order_by model.year desc
         if page:
             try:
                 return stmt.paginate(page, self._items_per_page).items
