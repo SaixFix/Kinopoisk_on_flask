@@ -1,35 +1,31 @@
 from flask import request
 from flask_restx import Namespace, Resource
 
-from project.dao.models.director import DirectorSchema
-
-director_ns = Namespace("directors")
-
-director_schema = DirectorSchema()
-directors_schema = DirectorSchema(many=True)
+from project.container import genre_service, director_service
+from project.setup.api.models import genre, director
+from project.setup.api.parsers import page_parser
 
 
-@director_ns.route("/")
+api = Namespace('directors')
+
+
+@api.route('/')
 class DirectorsView(Resource):
-
+    @api.expect(page_parser)
+    @api.marshal_with(director, as_list=True, code=200, description='OK')
     def get(self):
-        """get all directors"""
-        pass
-
-    def post(self):
-        """create new director"""
-        req_json = request.json
-        pass
+        """
+        Get all genres.
+        """
+        return director_service.get_all(**page_parser.parse_args())
 
 
-@director_ns.route("/<int:did>")
+@api.route('/<int:did>/')
 class DirectorView(Resource):
-
-    def get(self, did):
-        """get director by id"""
-        pass
-
-    def put(self, did):
-        """update director bu id"""
-        req_json = request.json
-        pass
+    @api.response(404, 'Not Found')
+    @api.marshal_with(genre, code=200, description='OK')
+    def get(self, did: int):
+        """
+        Get genre by id.
+        """
+        return genre_service.get_item(did)

@@ -1,36 +1,26 @@
-from project.dao.models.movie import Movie
+from typing import Optional
+
+from flask_sqlalchemy import BaseQuery
+from sqlalchemy import desc
+from werkzeug.exceptions import NotFound
+
+from project.dao.base import BaseDAO
+from project.models import Movie
 
 
-class MovieDAO:
+class MovieDAO(BaseDAO[Movie]):
+    __model__ = Movie
 
-    def __init__(self, session):
-        """Получает сессию"""
-        self.session = session
-
-    def get_all(self) -> list[dict]:
-        """Возвращает все фильмы"""
-        return self.session.query(Movie).all()
-
-    def get_one(self, fid):
-        """Возвращает фильм по id"""
-        return self.session.query(Movie).get(fid)
-
-    def create(self, data: dict):
-        """Создаем новый фильм"""
-        movie = Movie(**data)
-        self.session.add(movie)
-        self.session.commit()
-
-    def update(self, data: dict):
-        """Обновляем данные фильма"""
-        self.session.add(data)
-        self.session.commit()
-
-    def delete(self, fid):
-        """Удаляем фильм по id"""
-        movie = self.get_one(fid)
-        self.session.delete(movie)
-        self.session.commit()
-
-
-
+    def get_all_order_by(self, page, filter):
+        """Функция выводит список фильмов по странично(если задано на входе) и с фильтрацией по году(если фильтр задан на входе)"""
+        stmt = self._db_session.query(self.__model__)  # select * from self model
+        if filter == 'new':
+            stmt = stmt.order_by(desc(self.__model__.year))  # order_by model.year desc
+        if filter == 'old':
+            stmt = stmt.order_by(self.__model__.year) # order_by model.year desc
+        if page:
+            try:
+                return stmt.paginate(page, self._items_per_page).items
+            except NotFound:
+                return []
+        return stmt.all()

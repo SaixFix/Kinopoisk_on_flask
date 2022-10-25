@@ -1,33 +1,36 @@
-from project.dao.models.user import User
+from project.dao.base import BaseDAO
+from project.models import User
+from project.tools.security import generate_password_hash
 
 
-class UserDAO:
+class UserDAO(BaseDAO[User]):
+    __model__ = User
 
-    def __init__(self, session):
-        """Получает сессию"""
-        self.session = session
+    def create(self, login, password):
+        try:
+            self._db_session.add(User(email=login, password=generate_password_hash(password)))
+            self._db_session.commit()
 
-    def get_all(self) -> list[dict]:
-        """Возвращает всех пользователей"""
-        return self.session.query(User).all()
+        except Exception as e:
+            print(e)
+            self._db_session.rollback()
 
-    def get_one(self, username: str):
-        """Возвращает пользователя по username"""
-        return self.session.query(User).get(username)
+    def get_user_by_login(self, login):
 
-    def create(self, data: dict):
-        """Создаем нового пользователя"""
-        user = User(**data)
-        self.session.add(user)
-        self.session.commit()
+        try:
+            stmt = self._db_session.query(self.__model__).filter(self.__model__.email == login).one()
+            return stmt
 
-    def update(self, data: dict):
-        """Обновляем данные пользователя"""
-        self.session.add(data)
-        self.session.commit()
+        except Exception as e:
+            print(e)
+            return {}
 
-    def delete(self, username: str):
-        """Удаляем пользователя по id"""
-        user = self.get_one(username)
-        self.session.delete(user)
-        self.session.commit()
+    def update(self, login, data):
+
+        try:
+            self._db_session.query(self.__model__).filter(self.__model__.email == login).update(data)
+            self._db_session.commit()
+
+        except Exception as e:
+            print(e)
+            self._db_session.rollback()

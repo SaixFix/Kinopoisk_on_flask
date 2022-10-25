@@ -1,30 +1,19 @@
-from project.dao.director_dao import DirectorDAO
+from typing import Optional
+
+from project.dao.base import BaseDAO
+from project.models import Director
+from project.exceptions import ItemNotFound
 
 
 class DirectorService:
-    def __init__(self, dao: DirectorDAO):
-        """Получаем ДАО"""
+    def __init__(self, dao: BaseDAO) -> None:
         self.dao = dao
 
-    def get_all(self) -> list[dict]:
-        """Возвращает всех режиссеров"""
-        return self.dao.get_all()
+    def get_item(self, pk: int) -> Director:
+        if director := self.dao.get_by_id(pk):
+            return director
+        raise ItemNotFound(f'Director with pk={pk} not exists.')
 
-    def get_one(self, data: dict):
-        """Возвращает режиссера по id"""
-        return self.dao.get_one(data)
+    def get_all(self, page: Optional[int] = None) -> list[Director]:
+        return self.dao.get_all(page=page)
 
-    def create(self, data: dict):
-        """Создаем нового режиссера"""
-        self.dao.create(data)
-
-    def update(self, data: dict, did: int):
-        """Обновляем данные режиссера"""
-        director = self.get_one(did)
-
-        if "name" in data:
-            director.name = data.get("name")
-
-    def delete(self, did):
-        """Удаляем режиссера по id"""
-        self.dao.delete(did)
