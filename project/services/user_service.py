@@ -45,5 +45,10 @@ class UserService:
     def update_password(self, data, refresh_token):
         user = self.get_user_by_token(refresh_token)
         if user:
-            self.dao.update(login=user.email, data={'password': generate_password_hash(data.get('password_2'))})
-            return self.chech(login=user.email, password=data.get('password_2'))
+            check_pass = self.check(login=user.email, password=data.get('password'))
+            if check_pass is not None:
+                self.dao.update(login=user.email, data={'password': generate_password_hash(data.get('password_2'))})
+                return self.check(login=user.email, password=data.get('password_2'))
+            else:
+                return "Логин или пароль не верный"
+

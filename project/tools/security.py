@@ -19,9 +19,6 @@ def __generate_password_digest(password: str) -> bytes:
 def generate_password_hash(password: str) -> str:
     return base64.b64encode(__generate_password_digest(password)).decode('utf-8')
 
-def generate_password_hash(password: str) -> str:
-    return base64.b64encode(__generate_password_digest(password)).decode('utf-8')
-
 
 def compare_password_hash(password_hash, other_password) -> bool:
     return password_hash == generate_password_hash(other_password)
